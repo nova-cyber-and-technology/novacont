@@ -84,7 +84,7 @@ examples/    Usage examples
 
 ## Documentation
 
-Full documentation: [https://docs.novatechnology.app](https://novacont.gitbook.io/nova-docs)
+Full documentation: https://novacont.gitbook.io/nova-docs
 
 ---
 
