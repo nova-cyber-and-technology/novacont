@@ -2,25 +2,25 @@
 
 Thank you for your interest in contributing to NovaCont.
 
-NovaCont is a decentralized escrow protocol designed for secure, transparent, and programmable digital agreements. Contributions of all sizes are welcome, whether they involve smart contracts, documentation, testing, tooling, or developer experience.
+NovaCont is a decentralized escrow protocol for secure, transparent, and programmable digital agreements. Contributions of all sizes are welcome, whether they involve smart contracts, documentation, the SDK, or developer experience.
 
 Please read this guide before opening an Issue or Pull Request.
 
 ---
 
-# Table of Contents
+## Table of Contents
 
 - Code of Conduct
 - Ways to Contribute
 - Before You Start
-- Development Environment
 - Repository Structure
+- Development Environment
 - Development Workflow
 - Branch Naming
 - Commit Messages
 - Coding Standards
 - Solidity Guidelines
-- Testing Requirements
+- Testing
 - Security Guidelines
 - Pull Requests
 - Documentation
@@ -30,108 +30,86 @@ Please read this guide before opening an Issue or Pull Request.
 
 ---
 
-# Code of Conduct
+## Code of Conduct
 
 By participating in this project, you agree to follow our Code of Conduct.
 
-Please read:
-
-CODE_OF_CONDUCT.md
+See: [CODE_OF_CONDUCT.md](https://github.com/nova-cyber-and-technology/.github/blob/main/CODE_OF_CONDUCT.md) (org-wide)
 
 ---
 
-# Ways to Contribute
+## Ways to Contribute
 
-You can contribute in many different ways, including:
+You can contribute in many ways:
 
-- Smart contract development
-- Security research
-- Bug fixes
+- Smart contract improvements
+- Security research and responsible disclosure
+- SDK improvements and integration examples
 - Documentation improvements
-- SDK improvements
-- Test coverage
 - Gas optimization
 - Developer tooling
-- Examples and tutorials
 
 Not every contribution requires writing Solidity.
 
 ---
 
-# Before You Start
+## Before You Start
 
 Before starting work:
 
 - Read the project README.
-- Review the documentation.
+- Review the documentation at https://novacont.gitbook.io/nova-docs
 - Search existing Issues before creating a new one.
-- Open a discussion if the change is significant.
-
-For larger architectural changes, please discuss the proposal before writing code.
+- Open a discussion first for larger architectural changes, we'd rather talk through the direction before you invest time in code.
 
 ---
 
-# Development Environment
+## Repository Structure
 
-Clone the repository:
-
-```bash
-git clone https://github.com/NOVA-Cyber-Technology/NovaCont.git
-cd NovaCont
+```
+contracts/   Solidity smart contracts (NovaCont.sol)
+sdk/         TypeScript SDK for integrating with NovaCont
 ```
 
-Install dependencies:
+Additional directories (documentation, tests, deployment scripts) will be added as they're built out. Please open an Issue before creating a new top-level directory.
+
+---
+
+## Development Environment
+
+The two parts of the repo have separate toolchains, treat them independently.
+
+### SDK (`sdk/`)
 
 ```bash
+cd sdk
 npm install
+npm run typecheck
+npm run build
+npm test
 ```
 
-Compile contracts:
+Details in [`sdk/README.md`](./sdk/README.md).
 
-```bash
-npx hardhat compile
-```
+### Contracts (`contracts/`)
 
-Run tests:
-
-```bash
-npx hardhat test
-```
-
-If the project migrates to another toolchain (such as Foundry), this document will be updated accordingly.
+The contracts have been deployed and are live, but a public build/test setup isn't published in this repo yet. If you're planning to work on the Solidity side, please open an Issue first so we can coordinate on toolchain (Hardhat / Foundry), test fixtures, and how you can reproduce a clean local build.
 
 ---
 
-# Repository Structure
-
-```
-contracts/
-docs/
-sdk/
-scripts/
-test/
-audits/
-examples/
-```
-
-Please place new files in the appropriate directory.
-
----
-
-# Development Workflow
+## Development Workflow
 
 1. Fork the repository.
 2. Create a dedicated branch.
 3. Make your changes.
-4. Add or update tests.
-5. Verify that all tests pass.
-6. Open a Pull Request.
+4. Verify that the SDK still typechecks and builds (`npm run typecheck` and `npm run build` inside `sdk/`).
+5. Open a Pull Request.
 
-Keep Pull Requests focused on a single change whenever possible.
+Keep Pull Requests focused on a single change whenever possible; smaller PRs are easier to review and merge.
 
 ---
 
-# Branch Naming
+## Branch Naming
 
 Examples:
 
@@ -151,147 +129,108 @@ test/dispute-lifecycle
 
 ---
 
-# Commit Messages
+## Commit Messages
 
-Follow clear and descriptive commit messages.
-
-Examples:
+Clear, descriptive commit messages:
 
 ```
 feat: add dispute timeout validation
-
 fix: prevent duplicate jury assignment
-
 docs: update security documentation
-
-test: improve escrow lifecycle coverage
-
 refactor: simplify collateral calculations
 ```
 
-Avoid messages such as:
-
-```
-update
-
-fix
-
-changes
-
-test
-```
+Avoid vague messages like `update`, `fix`, `changes`, `test`.
 
 ---
 
-# Coding Standards
+## Coding Standards
 
-General principles:
-
-- Write readable code before clever code.
-- Keep functions small and focused.
-- Minimize duplicated logic.
-- Prefer explicit naming over abbreviations.
-- Document non-obvious behavior.
+- Readable code before clever code.
+- Small, focused functions.
+- Minimal duplicated logic.
+- Explicit naming over abbreviations.
+- Document non-obvious behavior with a comment; don't document the obvious.
 
 ---
 
-# Solidity Guidelines
+## Solidity Guidelines
 
-Smart contract contributions should follow these principles:
+For smart contract contributions:
 
 - Follow the Checks-Effects-Interactions pattern where appropriate.
 - Minimize external calls.
-- Use custom errors instead of revert strings when practical.
 - Emit events for important state changes.
 - Prefer immutable variables where possible.
 - Avoid unnecessary storage writes.
 - Consider gas efficiency, but never sacrifice readability or security solely for optimization.
+- Match the existing style of the contract you're editing. The current codebase uses `require(condition, "string")` for reverts rather than custom errors; if you'd like to migrate a section to custom errors, open an Issue to discuss it as a separate change, don't mix styles inside a single PR.
 
 ---
 
-# Testing Requirements
+## Testing
 
-Every smart contract change should include appropriate tests.
+A public test suite isn't in this repository yet. Static analysis has been run (Slither, results published in the docs), but unit/integration tests are still being organized for public release.
 
-Tests should cover:
+If you're contributing code:
 
-- Expected behavior
-- Failure cases
-- Permission checks
-- Timeout logic
-- State transitions
-- Edge cases
+- For SDK changes, add or update tests under `sdk/test/` where practical.
+- For contract changes, describe how you verified the change in the PR (local fork, testnet transaction, etc.), and be prepared to help set up a shared test fixture as part of the PR discussion.
 
-Pull Requests introducing new functionality without tests may be declined.
+This will get stricter as the test infrastructure matures. We won't reject a PR for missing tests that we don't yet require of ourselves.
 
 ---
 
-# Security Guidelines
+## Security Guidelines
 
 Security takes priority over new features.
 
-Please:
-
 - Never submit code that intentionally weakens protocol security.
-- Clearly explain security implications of your changes.
+- Explain security implications of your changes clearly in the PR.
 - Avoid introducing unnecessary trust assumptions.
 - Preserve deterministic contract behavior.
 
-If your contribution changes protocol security assumptions, describe those changes explicitly in the Pull Request.
-
-For reporting vulnerabilities, see:
-
-SECURITY.md
+For reporting vulnerabilities, see [SECURITY.md](./SECURITY.md); do not open a public Issue for a suspected vulnerability.
 
 ---
 
-# Pull Requests
+## Pull Requests
 
-Before submitting a Pull Request, ensure that:
+Before submitting:
 
-- All tests pass.
-- Code compiles successfully.
-- Documentation has been updated where necessary.
-- No unrelated changes are included.
+- SDK: `npm run typecheck` and `npm run build` pass inside `sdk/`.
+- Contract changes: describe how you verified them.
+- Documentation is updated where relevant.
+- No unrelated changes bundled in.
 - Commit history is reasonably clean.
 
-Reviewers may request additional changes before merging.
+Reviewers may request changes before merging.
 
 ---
 
-# Documentation
+## Documentation
 
-Documentation is considered part of the project.
-
-If your Pull Request changes:
+Documentation is part of the project. If your PR changes:
 
 - contract behavior
-- public APIs
+- SDK public APIs
 - deployment
 - configuration
 - protocol rules
 
-please update the relevant documentation.
+please update the relevant documentation in the same PR. In-repo docs (README, SECURITY, this file) go in the PR itself; user-facing GitBook docs at https://novacont.gitbook.io/nova-docs are updated separately, note in the PR if a GitBook update is also needed.
 
 ---
 
-# Reporting Bugs
+## Reporting Bugs
 
-Use GitHub Issues for:
+Use GitHub Issues for bugs, documentation problems, and feature requests.
 
-- Bugs
-- Documentation problems
-- Feature requests
-
-Security vulnerabilities should **not** be reported publicly.
-
-Please follow the process described in:
-
-SECURITY.md
+Security vulnerabilities should **not** be reported publicly. Follow the process in [SECURITY.md](./SECURITY.md).
 
 ---
 
-# Feature Requests
+## Feature Requests
 
 Feature requests should explain:
 
@@ -299,24 +238,20 @@ Feature requests should explain:
 - Why the feature is useful.
 - Possible implementation ideas (optional).
 
-Acceptance of feature requests is at the discretion of the maintainers.
+Acceptance is at the maintainers' discretion; a well-scoped Issue is much more likely to move forward than an unbounded proposal.
 
 ---
 
-# Licensing
+## Licensing
 
 NovaCont is licensed under the PolyForm Shield License 1.0.0, a source-available license, not a standard open source license. You may read, audit, and build on this code for non-competing purposes, but the license does not permit using it to build or ship a competing escrow product or service.
 
 By submitting code, documentation, or other contributions, you agree that your contribution will be licensed under these same terms.
 
-Please review:
+Please review [LICENSE](./LICENSE) before contributing.
 
-LICENSE
-
-before contributing.
+The SDK (`sdk/`) is licensed separately under MIT, see `sdk/LICENSE`.
 
 ---
 
 Thank you for helping build NovaCont.
-
-Every contribution helps improve the protocol for developers, researchers, and users around the world.
