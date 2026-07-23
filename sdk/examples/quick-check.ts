@@ -3,7 +3,7 @@ import { sepolia, baseSepolia } from "viem/chains";
 import { NovaContClient } from "../src/index.js";
 
 async function main() {
-  console.log("🚀 NovaCont SDK Hızlı Doğrulama Başlatılıyor...\n");
+  console.log("🚀 Starting NovaCont SDK quick check...\n");
 
   const chainName = process.env.CHAIN || "sepolia";
   const chain = chainName === "baseSepolia" ? baseSepolia : sepolia;
@@ -11,32 +11,32 @@ async function main() {
   const rpcUrl = process.env.TEST_RPC_URL || defaultRpc;
   const contractAddress = process.env.CONTRACT_ADDRESS || "0x98B577d22710DaEA8c657dc415a591e6CD36B14a";
 
-  console.log(`1. Viem PublicClient kuruluyor (Ağ: ${chain.name}, RPC: ${rpcUrl})...`);
+  console.log(`1. Setting up viem PublicClient (chain: ${chain.name}, RPC: ${rpcUrl})...`);
   const publicClient = createPublicClient({ chain, transport: http(rpcUrl) });
 
-  console.log("2. NovaContClient örneği oluşturuluyor...");
+  console.log("2. Creating NovaContClient instance...");
   const client = new NovaContClient({
     publicClient,
     contractAddressOverride: contractAddress as `0x${string}`,
   });
 
-  console.log("✅ SDK Sınıfı başarıyla örneklendi!");
-  
-  console.log(`\n3. [AĞ ÇAĞRISI] Kontrat (${contractAddress}) verileri sorgulanıyor...`);
+  console.log("✅ SDK client instantiated successfully.");
+
+  console.log(`\n3. [NETWORK CALL] Querying contract (${contractAddress})...`);
   try {
     const contractCount = await client.getContractCount();
     const fee = await client.getPlatformFeePercentage();
     const isJuryActive = await client.isJurySystemActive();
-    console.log(`   - Toplam Anlaşma Sayısı (contractCount): ${contractCount.toString()}`);
-    console.log(`   - Platform Komisyon Oranı (platformFeePercentage): %${fee.toString()}`);
-    console.log(`   - Jüri Sistemi Aktif mi (isJurySystemActive): ${isJuryActive ? 'Evet' : 'Hayır'}`);
-    console.log("\n🎉 TEBRİKLER! SDK gerçek Ethereum Sepolia kontratı ile sorunsuz iletişim kuruyor!");
+    console.log(`   - Total agreements (contractCount): ${contractCount.toString()}`);
+    console.log(`   - Platform fee (platformFeePercentage): ${fee.toString()}%`);
+    console.log(`   - Jury system active (isJurySystemActive): ${isJuryActive ? "yes" : "no"}`);
+    console.log("\n🎉 SDK is communicating with the live contract successfully.");
   } catch (err: any) {
-    console.error("   ❌ Kontrat çağrısı başarısız oldu:", err.message || err);
+    console.error("   ❌ Contract call failed:", err.message || err);
   }
 }
 
 main().catch((err) => {
-  console.error("Beklenmeyen Hata:", err);
+  console.error("Unexpected error:", err);
   process.exit(1);
 });
