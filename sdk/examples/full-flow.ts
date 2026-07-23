@@ -13,20 +13,20 @@ async function main() {
   const chainName = process.env.CHAIN || "sepolia";
   const chain = chainName === "baseSepolia" ? baseSepolia : sepolia;
   const defaultRpc = chain.id === sepolia.id ? "https://ethereum-sepolia-rpc.publicnode.com" : "https://sepolia.base.org";
-  
+
   const rpcUrl = process.env.TEST_RPC_URL || defaultRpc;
   const clientKey = process.env.CLIENT_PRIVATE_KEY as `0x${string}` | undefined;
   const providerKey = process.env.PROVIDER_PRIVATE_KEY as `0x${string}` | undefined;
   const contractAddress = process.env.CONTRACT_ADDRESS || "0x98B577d22710DaEA8c657dc415a591e6CD36B14a";
 
   if (!clientKey || !providerKey) {
-    console.log("ℹ️  CLIENT_PRIVATE_KEY ve PROVIDER_PRIVATE_KEY ayarlanmadığı için salt-okunur modda çalışılıyor.");
-    console.log("   Yazma işlemlerini test etmek için env değişkenlerini tanımlayabilirsiniz:");
-    console.log("   $env:CLIENT_PRIVATE_KEY=\"0x...\" ; $env:PROVIDER_PRIVATE_KEY=\"0x...\" ; npx tsx examples/full-flow.ts\n");
+    console.log("ℹ️  Running in read-only mode because CLIENT_PRIVATE_KEY and PROVIDER_PRIVATE_KEY are not set.");
+    console.log("   To exercise write operations, set both env vars, e.g.:");
+    console.log('   $env:CLIENT_PRIVATE_KEY="0x..." ; $env:PROVIDER_PRIVATE_KEY="0x..." ; npx tsx examples/full-flow.ts\n');
   }
 
   const publicClient = createPublicClient({ chain, transport: http(rpcUrl) });
-  
+
   const clientAccount = clientKey ? privateKeyToAccount(clientKey.startsWith("0x") ? clientKey : `0x${clientKey}`) : undefined;
   const providerAccount = providerKey ? privateKeyToAccount(providerKey.startsWith("0x") ? providerKey : `0x${providerKey}`) : undefined;
 
@@ -35,17 +35,17 @@ async function main() {
 
   const asClient = new NovaContClient({ publicClient, walletClient: clientWallet, contractAddressOverride: contractAddress as `0x${string}` });
 
-  console.log("Kontrat Adresi:", contractAddress);
-  if (clientAccount) console.log("Müşteri Adresi:", clientAccount.address);
-  if (providerAccount) console.log("Hizmet Sağlayıcı Adresi:", providerAccount.address);
+  console.log("Contract address:", contractAddress);
+  if (clientAccount) console.log("Client address:", clientAccount.address);
+  if (providerAccount) console.log("Provider address:", providerAccount.address);
 
   // Live agreement query
   const count = await asClient.getContractCount();
-  console.log("Mevcut Kontrat Sayısı (contractCount):", count.toString());
+  console.log("Total contracts (contractCount):", count.toString());
 
   if (count > 0n) {
     const agreement1 = await asClient.getAgreement(1n);
-    console.log("\n1 Numaralı Anlaşma Detayları:");
+    console.log("\nAgreement #1 details:");
     console.log("  - Client:", agreement1.client);
     console.log("  - Provider:", agreement1.provider);
     console.log("  - State:", agreement1.state);
@@ -53,7 +53,7 @@ async function main() {
     console.log("  - Evidence URI:", agreement1.evidenceURI);
   }
 
-  console.log("\n✅ SDK sorguları başarıyla tamamlandı!");
+  console.log("\n✅ SDK queries completed successfully.");
 }
 
 main().catch((err) => {
